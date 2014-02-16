@@ -1,23 +1,24 @@
 <?php
     session_name('peggame');
     @session_start;
-    
-    //var_dump($_SESSION);
-    
+        
     include('PegGameSimulator.class.php');
     $pegs = new PegGameSimulator;
+    $can_continue = true;
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
-        //echo "set game board from session";
     }
 
     if (!isset($_GET['do_next'])) {
         $pegs->MakeNewGameBoard();
         $_SESSION['gameboard'] = $pegs->SerializedGameBoard();
-        //echo "created new game board and saved to session";
+        $_SESSION['move_count'] = 0;
     } else {
-        //$pegs->MakeMove();
+        if ($pegs->MakeMove()) {
+            $_SESSION['move_count']++;
+        }
+        $can_continue = ($pegs->GetRemainingMoveCount() > 0 ? true : false);
     }
 ?>
 <!DOCTYPE html>
@@ -26,8 +27,16 @@
     </head>
     <body>
         <?php echo $pegs->DisplayGameBoard(); ?>
+        <p>Peg Count: <?php echo $pegs->GetPegCount(); ?></p>
+        <p>Move Count: <?php echo $_SESSION['move_count']; ?></p>
+        <p>Last Move: <?php echo $pegs->GetLastMove(); ?></p>
+        <p>Possible Moves: <?php echo $pegs->GetRemainingMoveCount(); ?></p>
+        <?php if ($can_continue) { $_SESSION['gameboard'] = $pegs->SerializedGameBoard(); ?>
         <form method="GET" action="<?php echo $_SERVER['PHP_SELF']; ?>">    
             <button type="submit" name="do_next" value="next">Next Move</button>
         </form>
+        <?php } else { ?>
+        <p>No more valid moves. <a href="index.php">Click here to restart.</a></p>
+        <?php } ?>
     </body>
 </html>

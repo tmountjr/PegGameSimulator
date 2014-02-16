@@ -2,40 +2,23 @@
 
 class PegGameSimulator
 {
-    private $neighbors = array(
-        1 => array(2, 3),
-        2 => array(4, 5),
-        3 => array(5, 6),
-        4 => array(2, 5, 7, 8),
-        5 => array(8, 9),
-        6 => array(3, 5, 9, 10),
-        7 => array(4, 8),
-        8 => array(5, 9),
-        9 => array(5, 8),
-        10 => array(6, 9),
-        11 => array(7, 12),
-        12 => array(8, 13),
-        13 => array(8, 9, 12, 14),
-        14 => array(9, 13),
-        15 => array(10, 14),
-    );
-    
-    private $destinations = array(
-        1 => array(4, 6),
-        2 => array(7, 9),
-        3 => array(8, 10),
-        4 => array(1, 6, 8, 13),
-        5 => array(12, 14),
-        6 => array(1, 4, 13, 15),
-        7 => array(2, 9),
-        8 => array(3, 10),
-        9 => array(2, 7),
-        10 => array(3, 8),
-        11 => array(4, 13),
-        12 => array(5, 14),
-        13 => array(4, 6, 8, 15),
-        14 => array(5, 12),
-        15 => array(6, 13),
+
+    private $move_map = array(
+        1 => array("2:4", "3:6"),
+        2 => array("4:7", "5:9"),
+        3 => array("5:8", "6:10"),
+        4 => array("2:1", "5:6", "7:11", "8:13"),
+        5 => array("8:12", "9:14"),
+        6 => array("3:1", "5:4", "9:13", "10:15"),
+        7 => array("4:2", "8:9"),
+        8 => array("5:3", "9:10"),
+        9 => array("5:2", "8:7"),
+        10 => array("6:3", "9:8"),
+        11 => array("7:4", "12:13"),
+        12 => array("8:5", "13:14"),
+        13 => array("8:4", "9:6", "12:8", "14:15"),
+        14 => array("9:5, 13:12"),
+        15 => array("10:6", "14:13"),
     );
     
     private $rows = array(
@@ -47,15 +30,66 @@ class PegGameSimulator
     );
     
     private $game_board = array();
+    
+    private $move_regex = "/(?<neighbor>\d+)+:(?<destination>\d+)/";
+    
+    private $last_move = "N/A";
+    public function GetLastMove()
+    {
+        return $this->last_move;
+    }
+    
+    public function GetPegCount()
+    {
+        $peg_count = 0;
+        foreach ($this->game_board as $peg_value) {
+            if ($peg_value === 'P') $peg_count++;
+        }
+        return $peg_count;
+    }
+    
+    public function GetRemainingMoveCount()
+    {
+        $p = $this->FindAllValidMoves();
+        return count($p);
+    }
 
     public function __construct()
     {
     }
     
-    private function FindValidMoves($peg_id)
+    private function FindAllValidMoves()
     {
-        $this_neighbors = $this->neighbors($peg_id);
-        
+        $possible_moves = array();
+        foreach ($this->game_board as $peg_id=>$peg_value) {
+            if (!$this->IsEmpty($peg_id)) {
+                $this_possible = $this->FindValidSinglePegMoves($peg_id);
+                if (count($this_possible) > 0) {
+                    foreach ($this_possible as $possible) {
+                        $possible_moves[] = array(
+                            "peg_id" => $peg_id,
+                            "move" => $possible,
+                        );
+                    }
+                }
+            }
+        }
+        return $possible_moves;
+    }
+    
+    private function FindValidSinglePegMoves($peg_id)
+    {
+        $this_movemap = $this->move_map[$peg_id];
+        $valid_moves = array();
+        foreach ($this_movemap as $move) {
+            preg_match($this->move_regex, $move, $matches);
+            $neighbor = $matches['neighbor'];
+            $destination = $matches['destination'];
+            if (!$this->IsEmpty($neighbor) && $this->IsEmpty($destination)) {
+                $valid_moves[] = $move;
+            }
+        }
+        return $valid_moves;
     }
     
     private function IsEmpty($peg_id)
@@ -87,6 +121,27 @@ class PegGameSimulator
         return $r;
     }
     
+    public function MakeMove() {
+        $r = false;
+        //find all possible moves
+        $possible_moves = $this->FindAllValidMoves();
+        $possible_move_count = count($possible_moves);
+
+        if ($possible_move_count > 0) {
+            $move_id = mt_rand(0, $possible_move_count - 1);
+            //source peg set to "O", neighbor peg set to "O", destination peg set to "P"
+            $peg_id = $possible_moves[$move_id]['peg_id'];
+            $move = $possible_moves[$move_id]['move'];
+            preg_match($this->move_regex, $move, $matches);
+            $this->game_board[$peg_id] = "O";
+            $this->game_board[$matches['neighbor']] = "O";
+            $this->game_board[$matches['destination']] = "P";
+            $r = true;
+            $this->last_move = sprintf("Peg %s: jumped %s to %s", $peg_id, $matches['neighbor'], $matches['destination']);
+        }
+        return $r;
+    }
+    
     public function SerializedGameBoard()
     {
         return serialize($this->game_board);
@@ -96,4 +151,5 @@ class PegGameSimulator
     {
         $this->game_board = unserialize($s);
     }
+    
 }
