@@ -21,3 +21,27 @@ C (8, D)
 D (8, 9, C, E)
 E (9, D)
 F (A, E)
+
+list of valid jump destinations
+1 (4, 6)
+2 (7, 9)
+3 (8, A)
+4 (1, 6, B, D)
+5 (C, E)
+6 (1, 4, D, F)
+7 (2, 9)
+8 (3, A)
+9 (2, 7)
+A (3, 8)
+B (4, D)
+C (5, E)
+D (4, 6, B, F)
+E (5, C)
+F (6, D)
+
+
+Steps:
+1. Choose a random starting point
+2. Loop through each of the 15 positions: save a list of possible jumps (non-empty neighbor and empty destination)
+3. pick a random jump and execute; remove the jumped peg
+4. repeat 2-3 until there are no more valid jumps
