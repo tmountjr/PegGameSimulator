@@ -4,7 +4,6 @@
         
     include('PegGameSimulator.class.php');
     $pegs = new PegGameSimulator;
-    $can_continue = true;
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
@@ -18,8 +17,8 @@
         if ($pegs->MakeMove()) {
             $_SESSION['move_count']++;
         }
-        $can_continue = ($pegs->GetRemainingMoveCount() > 0 ? true : false);
     }
+    $can_continue = ($pegs->GetRemainingMoveCount() > 0 ? true : false);
 ?>
 <!DOCTYPE html>
 <html>
