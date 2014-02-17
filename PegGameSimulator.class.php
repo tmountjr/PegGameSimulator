@@ -8,10 +8,10 @@ class PegGameSimulator
     private $game_board = array();
 	
 	private $row_count = 0;
-    
-    private $move_regex = "/(?<neighbor>\d+)+:(?<destination>\d+)/";
-    
-    private $last_move = "N/A";
+	
+	private $move_regex = "/(?<neighbor>\d+)+:(?<destination>\d+)/";
+	
+	private $last_move = "N/A";
     public function GetLastMove()
     {
         return $this->last_move;
@@ -25,6 +25,11 @@ class PegGameSimulator
         }
         return $peg_count;
     }
+	
+	public function GetMaxPegs()
+	{
+		return (pow($this->row_count, 2) + $this->row_count) / 2;
+	}
     
     public function GetRemainingMoveCount()
     {
@@ -172,5 +177,10 @@ class PegGameSimulator
     {
         $this->game_board = unserialize($s);
     }
+	
+	protected function GetGameBoard()
+	{
+		return $this->game_board;
+	}
     
 }
