@@ -3,33 +3,11 @@
 class PegGameSimulator
 {
 
-    private $move_map = array(
-        1 => array("2:4", "3:6"),
-        2 => array("4:7", "5:9"),
-        3 => array("5:8", "6:10"),
-        4 => array("2:1", "5:6", "7:11", "8:13"),
-        5 => array("8:12", "9:14"),
-        6 => array("3:1", "5:4", "9:13", "10:15"),
-        7 => array("4:2", "8:9"),
-        8 => array("5:3", "9:10"),
-        9 => array("5:2", "8:7"),
-        10 => array("6:3", "9:8"),
-        11 => array("7:4", "12:13"),
-        12 => array("8:5", "13:14"),
-        13 => array("8:4", "9:6", "12:11", "14:15"),
-        14 => array("9:5", "13:12"),
-        15 => array("10:6", "14:13"),
-    );
-    
-    private $rows = array(
-        array(1),
-        array(2, 3),
-        array(4, 5, 6),
-        array(7, 8, 9, 10),
-        array(11, 12, 13, 14, 15),
-    );
-    
+    private $move_map = array();
+    private $rows = array();
     private $game_board = array();
+	
+	private $row_count = 0;
     
     private $move_regex = "/(?<neighbor>\d+)+:(?<destination>\d+)/";
     
@@ -54,9 +32,50 @@ class PegGameSimulator
         return count($p);
     }
 
-    public function __construct()
+    public function __construct($row_count)
     {
+		$this->row_count = $row_count;
+		for ($row = 1; $row <= $row_count; $row++) {
+			$lower = 1 + ((pow($row, 2) - $row) / 2);
+			$upper = (pow($row, 2) + $row) / 2;
+			$cell_count = 1;
+			for ($i = $lower; $i <= $upper; $i++) {
+				$this->rows[$row][] = $i;
+				$row_id = $row;
+				$cell_id = $cell_count;
+				$peg_id = $i;
+				
+				if ($row_id - 2 > 0) {
+					if ($cell_id - 2 > 0)
+						$this->move_map[$peg_id][] = sprintf("%s:%s", $this->GetPegID($row_id - 1, $cell_id - 1), $this->GetPegID($row_id - 2, $cell_id - 2));
+					if ($cell_id <= $row_id - 2)
+						$this->move_map[$peg_id][] = sprintf("%s:%s", $this->GetPegID($row_id - 1, $cell_id), $this->GetPegID($row_id - 2, $cell_id));
+				}
+				
+				//horizontal neighbors and jump targets
+				if ($cell_id - 2 > 0) $this->move_map[$peg_id][] = sprintf("%s:%s", $this->GetPegID($row_id, $cell_id - 1), $this->GetPegID($row_id, $cell_id - 2));
+				if ($cell_id + 2 <= $row_id) $this->move_map[$peg_id][] = sprintf("%s:%s", $this->GetPegID($row_id, $cell_id + 1), $this->GetPegID($row_id, $cell_id + 2));
+				
+				//lower neighbors and jump targets
+				if ($row_id + 2 <= $row_count) {
+					$this->move_map[$peg_id][] = sprintf("%s:%s", $this->GetPegID($row_id + 1, $cell_id), $this->GetPegID($row_id + 2, $cell_id));
+					if ($cell_id + 2 <= $row_id + 2)
+						$this->move_map[$peg_id][] = sprintf("%s:%s", $this->GetPegID($row_id + 1, $cell_id + 1), $this->GetPegID($row_id + 2, $cell_id + 2));
+				}
+
+				$cell_count++;
+			}
+		}
     }
+	
+	private function GetPegID($row, $col)
+	{
+		$ret = false;
+		$r = (int)$row;
+		$c = (int)$col;
+		if ($c <= $r) $ret = $c + ((pow($r, 2) - $r) / 2);
+		return $ret;
+	}
     
     private function FindAllValidMoves()
     {
@@ -99,12 +118,14 @@ class PegGameSimulator
     
     public function MakeNewGameBoard()
     {
-        $this->game_board = array();
-        for ($i = 1; $i < 16; $i++) {
+		$this->game_board = array();
+		$max = (pow($this->row_count, 2) + $this->row_count) / 2;
+
+        for ($i = 1; $i <= $max; $i++) {
             $this->game_board[$i] = "P";
         }
         //choose a random spot to empty.
-        $this->game_board[mt_rand(1, 15)] = "O";
+        $this->game_board[mt_rand(1, $max)] = "O";
     }
     
     public function DisplayGameBoard()
@@ -115,7 +136,7 @@ class PegGameSimulator
             foreach ($row as $space_id) {
                 $this_row[] = $this->game_board[$space_id];
             }
-            $r .= str_pad(implode(" ", $this_row), 10, " ", STR_PAD_BOTH) . "\n";
+            $r .= str_pad(implode(" ", $this_row), $this->row_count * 2, " ", STR_PAD_BOTH) . "\n";
         }
         $r .= "</pre>";
         return $r;

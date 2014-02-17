@@ -3,7 +3,7 @@
     @session_start;
         
     include('PegGameSimulator.class.php');
-    $pegs = new PegGameSimulator;
+    $pegs = new PegGameSimulator(6);
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
