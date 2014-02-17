@@ -30,6 +30,10 @@ class PegGameSimulator
     );
     
     private $game_board = array();
+	protected function GetGameBoard()
+	{
+		return $this->game_board;
+	}
     
     private $move_regex = "/(?<neighbor>\d+)+:(?<destination>\d+)/";
     

@@ -14,7 +14,7 @@ class AutoSimulator extends PegGameSimulator
 		parent::MakeNewGameBoard();
 		while (parent::GetRemainingMoveCount() > 0) {
 			parent::MakeMove();
-			$move_log[] = parent::last_move;
+			$this->move_log[] = parent::GetLastMove();
 		}
 		
 		return true;
@@ -30,7 +30,7 @@ class AutoSimulator extends PegGameSimulator
 	}
 	
 	private function CountPegs() {
-		$gameboard = parent::game_board;
+		$gameboard = $this->GetGameBoard();
 		$p_count = array_count_values($gameboard);
 		return $p_count['P'];
 	}
