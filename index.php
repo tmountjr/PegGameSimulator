@@ -2,8 +2,13 @@
     session_name('peggame');
     @session_start;
         
-    include('PegGameSimulator.class.php');
-    $pegs = new PegGameSimulator(6);
+	function PGSAutoload($classname) {
+		include("$classname.class.php");
+	}
+	
+	spl_autoload_register("PGSAutoLoad");
+	
+	$pegs = new PegGameSimulator(5);
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
