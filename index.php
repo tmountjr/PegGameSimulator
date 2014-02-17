@@ -11,8 +11,9 @@
 	spl_autoload_register("PGSAutoload");
 	
 	$row_count = 5;
-	$game_count = 10000;
-    $pegs = new AutoSimulator($row_count);
+	$game_count = 1;
+    //$pegs = new AutoSimulator($row_count);
+	$pegs = new PegGameSimulator($row_count);
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
@@ -23,18 +24,19 @@
         $_SESSION['gameboard'] = $pegs->SerializedGameBoard();
         $_SESSION['move_count'] = 0;
     } else {
-        /*
+        
 		if ($pegs->MakeMove()) {
             $_SESSION['move_count']++;
         }
-		*/
-		//$pegs->SimulateSingleGame();
+		
+		/*
 		$stats = $pegs->SimulateMultipleGames($game_count);
 		for ($i = $pegs->GetMaxPegs(); $i > 0 ; $i--) $remaining_count[$i] = 0;
 		
 		foreach ($stats as $game_log) {
 			$remaining_count[$game_log['pegs_left']]++;
 		}
+		*/
     }
     $can_continue = ($pegs->GetRemainingMoveCount() > 0 ? true : false);
 ?>
