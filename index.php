@@ -1,4 +1,5 @@
 <?php
+	ini_set('max_execution_time', 300);
     session_name('peggame');
     @session_start;
 	
@@ -9,7 +10,9 @@
 	
 	spl_autoload_register("PGSAutoload");
 	
-    $pegs = new AutoSimulator(5);
+	$row_count = 5;
+	$game_count = 10000;
+    $pegs = new AutoSimulator($row_count);
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
@@ -25,7 +28,13 @@
             $_SESSION['move_count']++;
         }
 		*/
-		$pegs->SimulateSingleGame();
+		//$pegs->SimulateSingleGame();
+		$stats = $pegs->SimulateMultipleGames($game_count);
+		for ($i = $pegs->GetMaxPegs(); $i > 0 ; $i--) $remaining_count[$i] = 0;
+		
+		foreach ($stats as $game_log) {
+			$remaining_count[$game_log['pegs_left']]++;
+		}
     }
     $can_continue = ($pegs->GetRemainingMoveCount() > 0 ? true : false);
 ?>
@@ -45,11 +54,12 @@
         </form>
         <?php } else { ?>
         <p>No more valid moves. <a href="index.php">Click here to restart.</a></p>
-        <?php } ?>
-		<?php if (method_exists($pegs, 'GetStatistics')) { ?>
+			<?php if (method_exists($pegs, 'GetStatistics')) { ?>
 		<pre>
-		<?php var_dump($pegs->GetStatistics()); ?>
+		<?php //var_dump($pegs->GetStatistics()); ?>
+		<?php var_dump($remaining_count); ?>
 		</pre>
+			<?php } ?>
 		<?php } ?>
     </body>
 </html>

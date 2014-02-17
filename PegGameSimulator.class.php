@@ -25,6 +25,11 @@ class PegGameSimulator
         }
         return $peg_count;
     }
+	
+	public function GetMaxPegs()
+	{
+		return (pow($this->row_count, 2) + $this->row_count) / 2;
+	}
     
     public function GetRemainingMoveCount()
     {

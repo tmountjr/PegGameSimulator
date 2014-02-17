@@ -3,9 +3,11 @@
 class AutoSimulator extends PegGameSimulator
 {
 	private $move_log = array();
+	private $row_count = 0;
 
 	public function __construct($row_count)
 	{
+		$this->row_count = $row_count;
 		parent::__construct($row_count);
 	}
 	
@@ -18,6 +20,17 @@ class AutoSimulator extends PegGameSimulator
 		}
 		
 		return true;
+	}
+	
+	public function SimulateMultipleGames($game_count)
+	{
+		$statpack = array();
+		for ($i = 0; $i < $game_count; $i++) {
+			$this->SimulateSingleGame();
+			$statpack[] = $this->GetStatistics();
+			$this->move_log = array();
+		}
+		return $statpack;
 	}
 	
 	public function GetStatistics()
