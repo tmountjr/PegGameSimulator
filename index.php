@@ -9,7 +9,7 @@
 	
 	spl_autoload_register("PGSAutoload");
 	
-    $pegs = new AutoSimulator;
+    $pegs = new AutoSimulator(5);
     
     if (isset($_SESSION['gameboard'])) {
         $pegs->UnserializeGameBoard($_SESSION['gameboard']);
