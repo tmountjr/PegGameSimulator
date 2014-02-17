@@ -4,9 +4,9 @@ class AutoSimulator extends PegGameSimulator
 {
 	private $move_log = array();
 
-	public function __construct()
+	public function __construct($row_count)
 	{
-		parent::__construct();
+		parent::__construct($row_count);
 	}
 	
 	public function SimulateSingleGame()
