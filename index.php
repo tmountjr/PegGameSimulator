@@ -28,15 +28,20 @@
 	} else {
 		if (isset($_GET['do_next'])) {
 			$use_logic = isset($_GET['use_logic']);
+			$start_tick = microtime(true);
 			if ($pegs->MakeMove($use_logic)) {
+				$end_tick = microtime(true);
 				$_SESSION['move_count']++;
+				$elapsed = $end_tick - $start_tick;
 			}
 		} elseif (isset($_GET['do_all'])) {
 			$display_stats = true;
 			$game_count = (int)$_GET['game_count'];
 			$use_logic = isset($_GET['use_logic_auto']);
+			$start_tick = microtime(true);
 			$stats = $pegs->SimulateMultipleGames($game_count, $use_logic);
-			
+			$end_tick = microtime(true);
+			$elapsed = $end_tick - $start_tick;
 			for ($i = $pegs->GetMaxPegs(); $i > 0; $i--) $remaining_count[$i] = 0;
 			foreach ($stats as $game_log) $remaining_count[$game_log['pegs_left']]++;
 		}
@@ -52,6 +57,9 @@
 		<p>Peg Count: <?php echo $pegs->GetPegCount(); ?></p>
 		<p>Move Count: <?php echo $_SESSION['move_count']; ?></p>
 		<p>Last Move: <?php echo $pegs->GetLastMove(); ?></p>
+		<?php if (isset($elapsed)) { ?>
+		<p>Elapsed Time: <?php echo $elapsed; ?></p>
+		<?php } ?>
 		<p>Possible Moves: <?php echo $pegs->GetRemainingMoveCount(); ?></p>
 		<?php if ($can_continue) { $_SESSION['gameboard'] = $pegs->SerializedGameBoard(); ?>
 		<form method="GET" action="<?php echo $_SERVER['PHP_SELF']; ?>">
