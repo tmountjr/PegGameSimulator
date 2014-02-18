@@ -11,22 +11,22 @@ class AutoSimulator extends PegGameSimulator
 		parent::__construct($row_count);
 	}
 	
-	public function SimulateSingleGame()
+	public function SimulateSingleGame($use_logic = false)
 	{
 		parent::MakeNewGameBoard();
 		while (parent::GetRemainingMoveCount() > 0) {
-			parent::MakeMove();
+			parent::MakeMove($use_logic);
 			$this->move_log[] = parent::GetLastMove();
 		}
 		
 		return true;
 	}
 	
-	public function SimulateMultipleGames($game_count)
+	public function SimulateMultipleGames($game_count, $use_logic = false)
 	{
 		$statpack = array();
 		for ($i = 0; $i < $game_count; $i++) {
-			$this->SimulateSingleGame();
+			$this->SimulateSingleGame($use_logic);
 			$statpack[] = $this->GetStatistics();
 			$this->move_log = array();
 		}

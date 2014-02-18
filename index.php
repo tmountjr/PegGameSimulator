@@ -19,19 +19,23 @@
 		$pegs->UnserializeGameBoard($_SESSION['gameboard']);
 	}
 
+	$use_logic = false;
+	
 	if (!isset($_GET['do_next']) && !isset($_GET['do_all'])) {
 		$pegs->MakeNewGameBoard();
 		$_SESSION['gameboard'] = $pegs->SerializedGameBoard();
 		$_SESSION['move_count'] = 0;
 	} else {
 		if (isset($_GET['do_next'])) {
-			if ($pegs->MakeMove()) {
+			$use_logic = isset($_GET['use_logic']);
+			if ($pegs->MakeMove($use_logic)) {
 				$_SESSION['move_count']++;
 			}
 		} elseif (isset($_GET['do_all'])) {
 			$display_stats = true;
 			$game_count = (int)$_GET['game_count'];
-			$stats = $pegs->SimulateMultipleGames($game_count);
+			$use_logic = isset($_GET['use_logic_auto']);
+			$stats = $pegs->SimulateMultipleGames($game_count, $use_logic);
 			
 			for ($i = $pegs->GetMaxPegs(); $i > 0; $i--) $remaining_count[$i] = 0;
 			foreach ($stats as $game_log) $remaining_count[$game_log['pegs_left']]++;
@@ -53,6 +57,7 @@
 		<form method="GET" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 			<fieldset>
 				<legend>Single Moves</legend>
+				<input type="checkbox" name="use_logic" value="use_logic" <?php if ($use_logic) echo "checked"; ?>>Use Logic</input>
 				<button type="submit" name="do_next" value="next">Next Move</button>
 			</fieldset>
 		</form>
@@ -62,6 +67,7 @@
 				<label for="game_count">Game count:</label>
 				<input type="text" name="game_count" id="game_count" value="10" />
 				<button type="submit" name="do_all" id="do_all" value="all">Run Simulation</button>
+				<input type="checkbox" name="use_logic_auto" value="use_logic" <?php if ($use_logic) echo "checked"; ?>>Use Logic</input>
 			</fieldset>
 		</form>
 		<?php } else { ?>
