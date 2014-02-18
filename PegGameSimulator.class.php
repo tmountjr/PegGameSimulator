@@ -17,8 +17,8 @@ class PegGameSimulator
 		return $this->last_move;
 	}
 	
-	private function GetPegCount() {
-		$gameboard = $this->GetGameBoard();
+	public function GetPegCount() {
+		$gameboard = $this->game_board;
 		$p_count = array_count_values($gameboard);
 		return $p_count['P'];
 	}

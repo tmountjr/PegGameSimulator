@@ -38,7 +38,7 @@ class AutoSimulator extends PegGameSimulator
 		return array(
 			"num_moves" => count($this->move_log),
 			"move_log" => $this->move_log,
-			"pegs_left" => $this->CountPegs()
+			"pegs_left" => parent::GetPegCount()
 		);
 	}
 }
