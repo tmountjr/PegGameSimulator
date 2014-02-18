@@ -17,13 +17,10 @@ class PegGameSimulator
 		return $this->last_move;
 	}
 	
-	public function GetPegCount()
-	{
-		$peg_count = 0;
-		foreach ($this->game_board as $peg_value) {
-			if ($peg_value === 'P') $peg_count++;
-		}
-		return $peg_count;
+	private function GetPegCount() {
+		$gameboard = $this->GetGameBoard();
+		$p_count = array_count_values($gameboard);
+		return $p_count['P'];
 	}
 	
 	public function GetMaxPegs()

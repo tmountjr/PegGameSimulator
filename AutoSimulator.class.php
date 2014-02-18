@@ -41,10 +41,4 @@ class AutoSimulator extends PegGameSimulator
 			"pegs_left" => $this->CountPegs()
 		);
 	}
-	
-	private function CountPegs() {
-		$gameboard = $this->GetGameBoard();
-		$p_count = array_count_values($gameboard);
-		return $p_count['P'];
-	}
 }
