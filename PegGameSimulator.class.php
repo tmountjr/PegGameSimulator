@@ -17,7 +17,8 @@ class PegGameSimulator
 		return $this->last_move;
 	}
 	
-	public function GetPegCount() {
+	public function GetPegCount()
+	{
 		$gameboard = $this->game_board;
 		$p_count = array_count_values($gameboard);
 		return $p_count['P'];
@@ -79,12 +80,13 @@ class PegGameSimulator
 		return $ret;
 	}
 	
-	private function FindAllValidMoves()
+	private function FindAllValidMoves(array $gameboard = array())
 	{
+		if (count($gameboard) == 0) $gameboard = $this->game_board;
 		$possible_moves = array();
-		foreach ($this->game_board as $peg_id=>$peg_value) {
-			if (!$this->IsEmpty($peg_id)) {
-				$this_possible = $this->FindValidSinglePegMoves($peg_id);
+		foreach ($gameboard as $peg_id=>$peg_value) {
+			if (!$this->IsEmpty($peg_id, $gameboard)) {
+				$this_possible = $this->FindValidSinglePegMoves($peg_id, $gameboard);
 				if (count($this_possible) > 0) {
 					foreach ($this_possible as $possible) {
 						$possible_moves[] = array(
@@ -98,24 +100,26 @@ class PegGameSimulator
 		return $possible_moves;
 	}
 	
-	private function FindValidSinglePegMoves($peg_id)
+	private function FindValidSinglePegMoves($peg_id, array $gameboard = array())
 	{
+		if (count($gameboard) === 0) $gameboard = $this->game_board;
 		$this_movemap = $this->move_map[$peg_id];
 		$valid_moves = array();
 		foreach ($this_movemap as $move) {
 			preg_match($this->move_regex, $move, $matches);
 			$neighbor = $matches['neighbor'];
 			$destination = $matches['destination'];
-			if (!$this->IsEmpty($neighbor) && $this->IsEmpty($destination)) {
+			if (!$this->IsEmpty($neighbor, $gameboard) && $this->IsEmpty($destination, $gameboard)) {
 				$valid_moves[] = $move;
 			}
 		}
 		return $valid_moves;
 	}
 	
-	private function IsEmpty($peg_id)
+	private function IsEmpty($peg_id, array $gameboard = array())
 	{
-		return ($this->game_board[$peg_id] === "O" ? true : false);
+		if (count($gameboard) === 0) $gameboard = $this->game_board;
+		return ($gameboard[$peg_id] === "O" ? true : false);
 	}
 	
 	public function MakeNewGameBoard()
@@ -144,14 +148,25 @@ class PegGameSimulator
 		return $r;
 	}
 	
-	public function MakeMove() {
+	public function MakeMove($use_logic = false)
+	{
 		$r = false;
 		//find all possible moves
 		$possible_moves = $this->FindAllValidMoves();
 		$possible_move_count = count($possible_moves);
 
 		if ($possible_move_count > 0) {
-			$move_id = mt_rand(0, $possible_move_count - 1);
+			//simulate all moves and see what yields the most valid moves after that.
+			if ($use_logic) {
+				foreach ($possible_moves as $possible_move_id => $possible_move) {
+					$move_count[$possible_move_id] = $this->SimulateMove($this->game_board, $possible_move['peg_id'], $possible_move['move']);
+				}
+				arsort($move_count);
+				reset($move_count);
+				$move_id = key($move_count);
+			} else {
+				$move_id = mt_rand(0, $possible_move_count - 1);
+			}
 			//source peg set to "O", neighbor peg set to "O", destination peg set to "P"
 			$peg_id = $possible_moves[$move_id]['peg_id'];
 			$move = $possible_moves[$move_id]['move'];
@@ -163,6 +178,18 @@ class PegGameSimulator
 			$this->last_move = sprintf("Peg %s: jumped %s to %s", $peg_id, $matches['neighbor'], $matches['destination']);
 		}
 		return $r;
+	}
+	
+	private function SimulateMove($gameboard, $peg_id, $move)
+	{
+		//take a $gameboard, and $move $peg_id. Then, count how many moves are available to the new gameboard and return that.
+		$new_gb = $gameboard;
+		preg_match($this->move_regex, $move, $matches);
+		$new_gb[$peg_id] = "O";
+		$new_gb[$matches['neighbor']] = "O";
+		$new_gb[$matches['destination']] = "P";
+		$vm = $this->FindAllValidMoves($new_gb);
+		return count($vm);
 	}
 	
 	public function SerializedGameBoard()
