@@ -148,6 +148,38 @@ class PegGameSimulator
 		return $r;
 	}
 	
+	public function DisplayGameBoard2()
+	{
+		$table = array();
+		$max_col = ($this->row_count * 2) - 1;
+		$cell_id = 1;
+		foreach ($this->rows as $row_id => $row) {
+			$pcell = ($this->row_count + 1) - $row_id;
+			$pcount = 0;
+			for ($i = 1; $i <= $max_col; $i++) {
+				if ($pcount < $row_id && $i == $pcell) {
+					$table[$row_id][$i] = $this->game_board[$cell_id];
+					$cell_id++;
+					$pcount++;
+					$pcell += 2;
+				} else {
+					$table[$row_id][$i] = "";
+				}
+			}
+		}
+		
+	    $r = "<table>\n\t<tbody>";
+		foreach ($table as $row_id => $row) {
+			$r .= "\t\t<tr>\n";
+			foreach ($row as $cell) {
+				$r .= "\t\t\t<td>$cell</td>\n";
+			}
+			$r .= "\t\t</tr>\n";
+		}
+	    $r .= "\t</tbody>\n</table>\n";
+	    return $r;
+	}
+	
 	public function MakeMove($use_logic = false)
 	{
 		$r = false;

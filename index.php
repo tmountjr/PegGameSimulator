@@ -70,7 +70,7 @@
 		<!--[if lt IE 7]>
 		    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
 		<![endif]-->
-		<?php echo $pegs->DisplayGameBoard(); ?>
+		<?php echo $pegs->DisplayGameBoard2(); ?>
 		<p>Peg Count: <?php echo $pegs->GetPegCount(); ?></p>
 		<p>Move Count: <?php echo $_SESSION['move_count']; ?></p>
 		<p>Last Move: <?php echo $pegs->GetLastMove(); ?></p>
