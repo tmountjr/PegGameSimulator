@@ -77,8 +77,13 @@ form {
     margin-bottom: 20px;
 }
 
+tr {
+    line-height: 0;
+}
 
-
+table {
+    border-collapse: collapse;
+}
 
 
 
