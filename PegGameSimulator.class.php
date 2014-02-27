@@ -136,21 +136,6 @@ class PegGameSimulator
 	
 	public function DisplayGameBoard()
 	{
-		$r = "<pre>\n";
-		foreach ($this->rows as $row) {
-			$this_row = array();
-			foreach ($row as $space_id) {
-				$this_row[] = $this->game_board[$space_id];
-			}
-			$r .= str_pad(implode(" ", $this_row), $this->row_count * 2, " ", STR_PAD_BOTH) . "\n";
-		}
-		$r .= "</pre>";
-		return $r;
-	}
-	
-	public function DisplayGameBoard2()
-	{
-		$table = array();
 		$max_col = ($this->row_count * 2) - 1;
 		$cell_id = 1;
 		

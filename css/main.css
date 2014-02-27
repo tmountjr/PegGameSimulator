@@ -85,6 +85,10 @@ table {
     border-collapse: collapse;
 }
 
+.cell:hover {
+    font-weight: bold;
+}
+
 
 
 
