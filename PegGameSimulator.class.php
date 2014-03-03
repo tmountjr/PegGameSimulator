@@ -147,7 +147,7 @@ class PegGameSimulator
 			for ($i = 1; $i <= $max_col; $i++) {
 				$r .= "\t\t\t<td>";
 				if ($pcount < $row_id && $i == $pcell) {
-					$r .= "<p class='cell'>" . $this->game_board[$cell_id] . "</p>";
+					$r .= "<p class='cell' data-id='$cell_id'>" . $this->game_board[$cell_id] . "</p>";
 					$cell_id++;
 					$pcount++;
 					$pcell += 2;

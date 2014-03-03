@@ -11,4 +11,8 @@ $(document).ready(function() {
      * --return as normal
      */
     
+    $(".cell").on('click', function() {
+         
+    });
+    
 });
