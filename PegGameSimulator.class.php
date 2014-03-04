@@ -80,10 +80,11 @@ class PegGameSimulator
 		return $ret;
 	}
 	
-	private function FindAllValidMoves(array $gameboard = array())
+	public function FindAllValidMoves(array $gameboard = array(), $as_json = false)
 	{
 		if (count($gameboard) == 0) $gameboard = $this->game_board;
 		$possible_moves = array();
+		$possible_json = array();
 		foreach ($gameboard as $peg_id=>$peg_value) {
 			if (!$this->IsEmpty($peg_id, $gameboard)) {
 				$this_possible = $this->FindValidSinglePegMoves($peg_id, $gameboard);
@@ -93,11 +94,13 @@ class PegGameSimulator
 							"peg_id" => $peg_id,
 							"move" => $possible,
 						);
+						$possible_json[$peg_id][] = $possible;
 					}
 				}
 			}
 		}
-		return $possible_moves;
+		$ret = $as_json ? json_encode($possible_json) : $possible_moves;
+		return $ret;
 	}
 	
 	private function FindValidSinglePegMoves($peg_id, array $gameboard = array())
@@ -147,7 +150,7 @@ class PegGameSimulator
 			for ($i = 1; $i <= $max_col; $i++) {
 				$r .= "\t\t\t<td>";
 				if ($pcount < $row_id && $i == $pcell) {
-					$r .= "<p class='cell' data-id='$cell_id'>" . $this->game_board[$cell_id] . "</p>";
+					$r .= "<p class='cell' id='$cell_id'>{$this->game_board[$cell_id]}</p>";
 					$cell_id++;
 					$pcount++;
 					$pcell += 2;
